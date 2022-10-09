@@ -25,7 +25,15 @@ TBitField::TBitField(int len)
 
 TBitField::TBitField(const TBitField& bf) // конструктор копирования
 {
+    BitLen = bf.BitLen;
+    MemLen = bf.MemLen;
 
+    pMem = new TELEM[MemLen];
+    if (pMem != NULL) {
+        for (int count = 0; count < MemLen; count++) {
+            pMem[count] = bf.pMem[count];
+        }
+    }
 }
 
 TBitField::~TBitField()

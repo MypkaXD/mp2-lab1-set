@@ -58,6 +58,7 @@ public:
     friend ostream& operator<<(ostream& ostr, const TBitField& bf); //      (#П4)
 
     // добавил для тестов
+    /*
     int GetMemLen() { return MemLen; }
     void printpMem() {
         for (int count = 0; count < MemLen; count++) {
@@ -68,6 +69,7 @@ public:
     TELEM GetMemMasktest(const int n) const {
         return (1 << n);
     }
+    */
 };
 // Структура хранения битового поля
 //   бит.поле - набор битов с номерами от 0 до BitLen

@@ -9,18 +9,18 @@
 
 TBitField::TBitField(int len)
 {
-    if (len < 0) {
-        (throw "ERROR: negative lenght");
-    }
+    if (len < 0)
+        (throw "ERROR: negative bit field length");
+
     BitLen = len;
     MemLen = BitLen / (sizeof(TELEM) * 8) + 1; //кол-во элеметов TELEM для хранения всего множества
     pMem = new TELEM[MemLen];
 
-    if (pMem != NULL) {
-        for (int count = 0; count < MemLen; count++) {
-            pMem[count] = 0;
-        }
-    }
+    if (pMem == NULL)
+        (throw "ERROR: Error with pMem array");
+
+    for (int count = 0; count < MemLen; count++)
+        pMem[count] = 0;
 }
 
 TBitField::TBitField(const TBitField& bf) // конструктор копирования
@@ -30,9 +30,8 @@ TBitField::TBitField(const TBitField& bf) // конструктор копиро
 
     pMem = new TELEM[MemLen];
     if (pMem != NULL) {
-        for (int count = 0; count < MemLen; count++) {
+        for (int count = 0; count < MemLen; count++)
             pMem[count] = bf.pMem[count];
-        }
     }
 }
 
@@ -51,18 +50,15 @@ int TBitField::GetMemIndex(const int n) const // индекс Мем для би
          По факту они нам не нужны, мы их не инициализировали (только в начале 0, когда создали массив pMem)
          Какой-то важной информации для пользователя там нет, поэтому надо использовать BitLen - 1, a не sizeof(TELEM) * 8 * MemLen - 1
          Деже если мы в будущем добавим какой-то элемент, то нам придется увеличить BitLen++, иначе будет не логично, ведь BitLen хранит в себе мощность |U|.
-    */
-    if (n > BitLen - 1) {
-        throw ("ERROR: unknown index");
-    }
-    /*
+
         На всякий случай обработаю и такую ошибку, вдруг понадобится, но ведь если рассмотреть создание Битового поля, эта ошибка там рассматривается, то есть
         мы не сможем создать отрицательное битовое поле (|U| >= 0). Поэтому здесь нет смысла рассматривать её, ведь этот метод не статичный, то есть мы не можем
         вызвать его без создания Битового поля.
     */
-    if (n < 0) {
-        (throw "ERROR: negative lenght");
+    if (n > BitLen - 1 || n < 0) {
+        throw ("ERROR: unknown index of bit n");
     }
+
 
     return n / (sizeof(TELEM) * 8);
     /*
@@ -89,6 +85,9 @@ int TBitField::GetLength(void) const // получить длину (к-во б�
 
 void TBitField::SetBit(const int n) // установить бит
 {
+    if (n < 0 || n >= BitLen)
+        (throw "ERROR: unknown index of bit n");
+
     TELEM mask = GetMemMask(n);
     int index = GetMemIndex(n);
     pMem[index] |= mask;
@@ -96,6 +95,9 @@ void TBitField::SetBit(const int n) // установить бит
 
 void TBitField::ClrBit(const int n) // очистить бит
 {
+    if (n < 0 || n >= BitLen)
+        (throw "ERROR: unknown index of bit n");
+
     TELEM mask = GetMemMask(n);
     int index = GetMemIndex(n);
     pMem[index] &= ~mask;
@@ -103,6 +105,9 @@ void TBitField::ClrBit(const int n) // очистить бит
 
 int TBitField::GetBit(const int n) const // получить значение бита
 {
+    if (n < 0 || n >= BitLen)
+        (throw "ERROR: unknown index of bit n");
+
     TELEM mask = GetMemMask(n);
     int index = GetMemIndex(n);
     return bool(pMem[index] & mask);
@@ -112,6 +117,9 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 TBitField& TBitField::operator=(const TBitField& bf) // присваивание
 {
+    if (this == &bf)
+        return *this; //если они изначално равны, то нет смысла делать присваивание
+
     BitLen = bf.BitLen;
     if (MemLen != bf.MemLen) {
         MemLen = bf.MemLen;
@@ -144,15 +152,13 @@ bool TBitField::operator!=(const TBitField& bf) const // сравнение
 
 TBitField TBitField::operator|(const TBitField& bf) // операция "или"
 {
-    int maxLenght = std::max(BitLen, bf.BitLen);
-
-    TBitField tempBitField(maxLenght);
+    TBitField tempBitField(std::max(BitLen, bf.BitLen));
 
     for (int count = 0; count < MemLen; count++) {
         tempBitField.pMem[count] = pMem[count];
     }
     for (int count = 0; count < bf.MemLen; count++) {
-        tempBitField.pMem[count] |= pMem[count];
+        tempBitField.pMem[count] |= bf.pMem[count];
     }
 
     return tempBitField;
@@ -160,9 +166,7 @@ TBitField TBitField::operator|(const TBitField& bf) // операция "или"
 
 TBitField TBitField::operator&(const TBitField& bf) // операция "и"
 {
-    int maxLenght = std::max(BitLen, bf.BitLen);
-
-    TBitField tempBitField(maxLenght);
+    TBitField tempBitField(std::max(BitLen, bf.BitLen));
 
     for (int count = 0; count < MemLen; count++)
     {
@@ -177,14 +181,15 @@ TBitField TBitField::operator&(const TBitField& bf) // операция "и"
 
 TBitField TBitField::operator~(void) // отрицание
 {
-    TBitField other(BitLen);
+    TBitField tempBitField(BitLen);
+
     for (int count = 0; count < BitLen; count++) {
         if (GetBit(count))
-            other.ClrBit(count);
+            tempBitField.ClrBit(count);
         else
-            other.SetBit(count);
+            tempBitField.SetBit(count);
     }
-    return other;
+    return tempBitField;
 }
 
 // ввод/вывод
@@ -192,33 +197,22 @@ TBitField TBitField::operator~(void) // отрицание
 istream& operator>>(istream& istr, TBitField& bf) // ввод
 {
     char x;
-    for (int i = 0; i < bf.BitLen; i++)
+    for (int count = 0; count < bf.BitLen; count++)
     {
         istr >> x;
         if (x == '0')
-        {
-            bf.ClrBit(i);
-        }
+            bf.ClrBit(count);
         else if (x == '1')
-        {
-            bf.SetBit(i);
-        }
+            bf.SetBit(count);
         else
-        {
             (throw "ERROR: Unknown type of bit");
-        }
     }
     return istr;
 }
 
 ostream& operator<<(ostream& ostr, const TBitField& bf) // вывод
 {
-    for (int i = 0; i < bf.BitLen; i++)
-    {
-        if (bf.GetBit(i))
-            ostr << '1';
-        else
-            ostr << '0';
-    }
+    for (int count = 0; count < bf.BitLen; count++)
+        ostr << bf.GetBit(count);
     return ostr;
 }

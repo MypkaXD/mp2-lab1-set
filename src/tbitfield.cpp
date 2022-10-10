@@ -6,18 +6,20 @@
 // Битовое поле
 
 #include "tbitfield.h"
+#include <assert.h>
 
 TBitField::TBitField(int len)
 {
     if (len < 0)
         (throw "ERROR: negative bit field length");
-
+    //assert(len < 0 && "ERROR: negative bit field length"); //как обработать исключения через assert?
     BitLen = len;
     MemLen = BitLen / (sizeof(TELEM) * 8) + 1; //кол-во элеметов TELEM для хранения всего множества
     pMem = new TELEM[MemLen];
 
     if (pMem == NULL)
         (throw "ERROR: Error with pMem array");
+    //assert(pMem == NULL && "ERROR: negative bit field length");
 
     for (int count = 0; count < MemLen; count++)
         pMem[count] = 0;
@@ -73,7 +75,7 @@ TELEM TBitField::GetMemMask(const int n) const // битовая маска дл
         если я правильно понял, то маска, это такое число типа TELEM, которое в двоичном представлении имеет 1 еденичку и все оставшиеся элементы = 0
         Вопрос только стомт в том, надо ли писать n-1 или просто n.
     */
-    return (1 << n);
+    return ((TELEM)1 << n);//надо преобразовать 1 типа int в тип TELEM, иначе, если TELEM = unsigned long long, то все сломается
 }
 
 // доступ к битам битового поля

@@ -7,25 +7,26 @@
 
 #include "tset.h"
 
-TSet::TSet(int mp) : BitField(mp), MaxPower(mp)
+TSet::TSet(int mp)
+    : BitField(mp), MaxPower(mp)
 {
 }
 
 // конструктор копирования
-TSet::TSet(const TSet& s) : MaxPower(s.MaxPower), BitField(s.BitField)
+TSet::TSet(const TSet& s)
+    : MaxPower(s.MaxPower), BitField(s.BitField)
 {
 }
 
 // конструктор преобразования типа
-TSet::TSet(const TBitField& bf) : BitField(bf)
+TSet::TSet(const TBitField& bf)
+    : BitField(bf), MaxPower(bf.GetLength())
 {
-    MaxPower = bf.GetLength();
 }
 
 TSet::operator TBitField()
 {
-    TBitField temp = (TBitField)*this;
-    return temp;
+    return BitField;
 }
 
 int TSet::GetMaxPower(void) const // получить макс. к-во эл-тов
@@ -36,21 +37,21 @@ int TSet::GetMaxPower(void) const // получить макс. к-во эл-т�
 int TSet::IsMember(const int Elem) const // элемент множества?
 {
     if (Elem < 0 || Elem >= MaxPower)
-        (throw "ERROR: Unknown Elem");
+        (throw "ERROR: The Elem is out of range of array");
     return BitField.GetBit(Elem);
 }
 
 void TSet::InsElem(const int Elem) // включение элемента множества
 {
     if (Elem < 0 || Elem >= MaxPower)
-        (throw "ERROR: Unknown Elem");
+        (throw "ERROR: The Elem is out of range of array");
     BitField.SetBit(Elem);
 }
 
 void TSet::DelElem(const int Elem) // исключение элемента множества
 {
     if (Elem < 0 || Elem >= MaxPower)
-        (throw "ERROR: Unknown Elem");
+        (throw "ERROR: The Elem is out of range of array");
     BitField.ClrBit(Elem);
 }
 
@@ -85,37 +86,53 @@ int TSet::operator!=(const TSet& s) const // сравнение
 
 TSet TSet::operator+(const TSet& s) // объединение
 {
-    return TSet(0);
+    return TSet(BitField | s.BitField);
 }
 
 TSet TSet::operator+(const int Elem) // объединение с элементом
 {
-    return TSet(0);
+    if (Elem < 0 || Elem >= MaxPower)
+        (throw "ERROR: The Elem is out of range of array");
+
+
+    TSet tempTSet(*this);
+    tempTSet.InsElem(Elem);
+
+    return tempTSet;
 }
 
 TSet TSet::operator-(const int Elem) // разность с элементом
 {
-    return TSet(0);
+    if (Elem < 0 || Elem >= MaxPower)
+        (throw "ERROR: The Elem is out of range of array");
+
+
+    TSet tempTSet(*this);
+    tempTSet.DelElem(Elem);
+
+    return tempTSet;
 }
 
 TSet TSet::operator*(const TSet& s) // пересечение
 {
-    return TSet(0);
+    return TSet(BitField & s.BitField);
 }
 
 TSet TSet::operator~(void) // дополнение
 {
-    return TSet(0);
+    return TSet(~BitField);
 }
 
 // перегрузка ввода/вывода
 
 istream& operator>>(istream& istr, TSet& s) // ввод
 {
+    istr >> s.BitField;
     return istr;
 }
 
 ostream& operator<<(ostream& ostr, const TSet& s) // вывод
 {
+    ostr << s.BitField;
     return ostr;
 }

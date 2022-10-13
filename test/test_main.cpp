@@ -38,10 +38,12 @@ int main(int argc, char** argv) {
         std::cout << test_3.GetLength() - 1 << std::endl;
     */
     //Тест маски
-    /*
-        TBitField test4(168);
-        std::cout << test4.GetMemMasktest(2) << std::endl;
-    */
+
+        //TBitField test4(32);
+        //std::cout << test4 << std::endl;
+        //test4.SetBit(33);
+        //std::cout << test4 << std::endl;
+
     //тест с set get clr и << >>;
     /*
         const int size1 = 4, size2 = 5;
@@ -64,6 +66,7 @@ int main(int argc, char** argv) {
         else if (!(expBf.GetBit(3)))
             std::cout << "false";
     */
+
 
     /*const int size1 = 4, size2 = 5;
     TBitField bf1(size1), bf2(size2), expBf(size2);
@@ -94,4 +97,25 @@ int main(int argc, char** argv) {
     */
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
+
+    //const int size1 = 70, size2 = 35;
+    //TBitField bf1(size1), bf2(size2), bf3(size1);
+    //for (int i = 0; i < size1; i++)
+    //    bf1.SetBit(i);
+    //for (int i = 1; i < size2; i += 2)
+    //    bf2.SetBit(i);
+    //std::cout << bf1 << "\n" << bf2 << std::endl;
+    //TBitField res1 = bf1 | bf2;
+    //TBitField res2 = bf2 | bf1;
+    //std::cout << res1 << "\n" << res2;
+
+
+    //long long a;
+    //a = (1 << 5);
+    //std::cout << a << std::endl;
+    //long long b;
+    //std::cout << sizeof(TELEM) << std::endl;
+    //std::cout << (sizeof(TELEM) * 8 - 1) << std::endl;
+    //b = 33 & 31;
+    //std::cout << b << std::endl;
 }

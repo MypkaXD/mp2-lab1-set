@@ -12,7 +12,7 @@
 
 using namespace std;
 
-typedef unsigned int TELEM;
+typedef uint32_t TELEM;
 
 class TBitField
 {
@@ -28,18 +28,6 @@ public:
     TBitField(int len);                //                                   (#О1)
     TBitField(const TBitField& bf);    //                                   (#П1)
     ~TBitField();                      //                                    (#С)
-
-    bool comparison(const TBitField& bf) const {
-
-        if (BitLen != bf.BitLen)
-            return false;
-        else
-            for (int count = 0; count < MemLen; count++)
-                if (pMem[count] != bf.pMem[count]) {
-                    return false;
-                }
-        return true;
-    }
     // доступ к битам
     int GetLength(void) const;      // получить длину (к-во битов)           (#О)
     void SetBit(const int n);       // установить бит                       (#О4)
@@ -68,6 +56,22 @@ public:
     }
     TELEM GetMemMasktest(const int n) const {
         return (1 << n);
+    }
+    void setter(int count, int eqal) {
+        for (int i = 0; i < count - 1; i++) {
+            pMem[i] = eqal;
+        }
+    }
+    bool comparison(const TBitField& bf) const {
+
+        if (BitLen != bf.BitLen)
+            return false;
+        else
+            for (int count = 0; count < MemLen; count++)
+                if (pMem[count] != bf.pMem[count]) {
+                    return false;
+                }
+        return true;
     }
     */
 };

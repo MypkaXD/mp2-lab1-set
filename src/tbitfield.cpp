@@ -75,7 +75,7 @@ TELEM TBitField::GetMemMask(const int n) const // битовая маска дл
         если я правильно понял, то маска, это такое число типа TELEM, которое в двоичном представлении имеет 1 еденичку и все оставшиеся элементы = 0
         Вопрос только стомт в том, надо ли писать n-1 или просто n.
     */
-    return ((TELEM)1 << n);//надо преобразовать 1 типа int в тип TELEM, иначе, если TELEM = unsigned long long, то все сломается
+    return ((TELEM)1 << (n & (sizeof(TELEM) * 8 - 1)));//надо преобразовать 1 типа int в тип TELEM, иначе, если TELEM = unsigned long long, то все сломается
 }
 
 // доступ к битам битового поля
@@ -170,14 +170,9 @@ TBitField TBitField::operator&(const TBitField& bf) // операция "и"
 {
     TBitField tempBitField(std::max(BitLen, bf.BitLen));
 
-    for (int count = 0; count < MemLen; count++)
-    {
-        tempBitField.pMem[count] = pMem[count];
-    }
-    for (int count = 0; count < bf.MemLen; count++)
-    {
-        tempBitField.pMem[count] &= bf.pMem[count];
-    }
+    for (int count = 0; count < std::min(MemLen, bf.MemLen); count++)
+        tempBitField.pMem[count] = pMem[count] & bf.pMem[count];
+
     return tempBitField;
 }
 
